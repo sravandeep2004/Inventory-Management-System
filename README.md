@@ -78,77 +78,7 @@ src/test/java/com/myapp/demo/
 - Maven 3.6+
 - MySQL 8.0+
 
-## Installation & Setup
 
-### 1. Clone the Repository
-
-```bash
-git clone <repository-url>
-cd demo
-```
-
-### 2. Setup MySQL Database
-
-```sql
-CREATE DATABASE mydb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
-
-### 3. Configure Database Connection
-
-Edit `src/main/resources/application.properties`:
-
-```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/mydb
-spring.datasource.username=root
-spring.datasource.password=admin
-```
-
-### 4. (Optional) Configure Email Alerts
-
-Edit `src/main/resources/application.properties` to enable email notifications:
-
-```properties
-spring.mail.host=smtp.gmail.com
-spring.mail.port=587
-spring.mail.username=your-email@gmail.com
-spring.mail.password=your-app-password
-spring.mail.properties.mail.smtp.auth=true
-spring.mail.properties.mail.smtp.starttls.enable=true
-spring.mail.properties.mail.smtp.starttls.required=true
-```
-
-**Note:** For Gmail, use an [App Password](https://myaccount.google.com/apppasswords) instead of your regular password.
-
-### 5. Build the Project
-
-```bash
-mvn clean package
-```
-
-### 6. Run the Application
-
-```bash
-mvn spring-boot:run
-```
-
-The application will start on `http://localhost:8080`
-
-## Running Tests
-
-Run all tests:
-```bash
-mvn test
-```
-
-Run specific test class:
-```bash
-mvn test -Dtest=InventoryStockRepositoryTest
-```
-
-Run tests with coverage:
-```bash
-mvn test jacoco:report
-```
 
 ## API Documentation
 
@@ -363,16 +293,6 @@ Please review and restock if necessary.
 | updatedDate | LocalDateTime | Auto-updated on modification |
 | status | Enum | ACTIVE or INACTIVE |
 
-## Configuration Properties
-
-| Property | Default | Description |
-|----------|---------|-------------|
-| inventory.alert.threshold | 2 | Stock level threshold for alerts |
-| spring.jpa.hibernate.ddl-auto | update | Database schema auto-update |
-| spring.mail.host | smtp.example.com | SMTP server hostname |
-| spring.mail.port | 587 | SMTP server port |
-| spring.mail.username | your@email.com | Email account username |
-| spring.mail.password | yourpassword | Email account password |
 
 ## Development Notes
 
