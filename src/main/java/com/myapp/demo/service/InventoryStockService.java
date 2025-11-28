@@ -44,6 +44,10 @@ public class InventoryStockService {
 
         validateInventoryDto(dto);
 
+        if (inventoryRepository.existsByProductName(dto.getProductName())) {
+            throw new InvalidRequestException("duplicate product cannot be add");
+        }
+
         InventoryStock item = InventoryStock.builder()
                 .productName(dto.getProductName())
                 .pricePerUnit(dto.getPricePerUnit())

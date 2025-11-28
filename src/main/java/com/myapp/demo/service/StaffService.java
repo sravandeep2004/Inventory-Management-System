@@ -42,6 +42,11 @@ public class StaffService {
             throw new InvalidRequestException("Email already exists: " + dto.getEmail());
         }
 
+        // Check if phone number already exists
+        if (staffRepository.findByPhoneNumber(dto.getPhoneNumber()).isPresent()) {
+            throw new InvalidRequestException("Phone number already exists: " + dto.getPhoneNumber());
+        }
+
         Staff staff = Staff.builder()
                 .name(dto.getName())
                 .email(dto.getEmail())
@@ -49,6 +54,7 @@ public class StaffService {
                 .department(dto.getDepartment())
                 .rights(dto.getRights())
                 .phoneNumber(dto.getPhoneNumber())
+                .password(dto.getPassword()) // In production, encode this!
                 .status(dto.getStatus() != null ? dto.getStatus() : Status.ACTIVE)
                 .build();
 
@@ -90,9 +96,16 @@ public class StaffService {
                 .orElseThrow(() -> new ItemNotFoundException("Staff not found with ID: " + staffId));
 
         // Check if new email already exists (and it's different from current email)
-        if (!staff.getEmail().equals(dto.getEmail()) && 
-            staffRepository.findByEmail(dto.getEmail()).isPresent()) {
+        if (!staff.getEmail().equals(dto.getEmail()) &&
+                staffRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new InvalidRequestException("Email already exists: " + dto.getEmail());
+        }
+
+        // Check if new phone number already exists (and it's different from current
+        // phone number)
+        if (!staff.getPhoneNumber().equals(dto.getPhoneNumber()) &&
+                staffRepository.findByPhoneNumber(dto.getPhoneNumber()).isPresent()) {
+            throw new InvalidRequestException("Phone number already exists: " + dto.getPhoneNumber());
         }
 
         staff.setName(dto.getName());
@@ -100,7 +113,11 @@ public class StaffService {
         staff.setDesignation(dto.getDesignation());
         staff.setDepartment(dto.getDepartment());
         staff.setRights(dto.getRights());
+        staff.setRights(dto.getRights());
         staff.setPhoneNumber(dto.getPhoneNumber());
+        if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
+            staff.setPassword(dto.getPassword()); // In production, encode this!
+        }
         if (dto.getStatus() != null) {
             staff.setStatus(dto.getStatus());
         }
