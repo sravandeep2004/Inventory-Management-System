@@ -12,6 +12,11 @@ import java.util.List;
 @Repository
 public interface InventoryStockRepository extends JpaRepository<InventoryStock, Long> {
     /**
+     * Check if a product with the given name exists
+     */
+    boolean existsByProductName(String productName);
+
+    /**
      * Find all inventory items with quantity less than the given threshold
      * Used for alert notifications
      */
