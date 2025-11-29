@@ -8,6 +8,8 @@ const Dashboard = () => {
         totalProducts: 0,
         lowStockProducts: 0,
         totalStaff: 0,
+        activeProducts: 0,
+        inactiveProducts: 0,
         recentProducts: []
     });
     const { user } = useAuth();
@@ -105,11 +107,23 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                {user?.role === 'ADMIN' && (
+                {user?.role === 'ADMIN' ? (
                     <div className="bg-white overflow-hidden shadow rounded-lg">
                         <div className="px-4 py-5 sm:p-6">
                             <dt className="text-sm font-medium text-gray-500 truncate">Total Staff</dt>
                             <dd className="mt-1 text-3xl font-semibold text-gray-900">{stats.totalStaff}</dd>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="bg-white overflow-hidden shadow rounded-lg">
+                        <div className="px-4 py-5 sm:p-6">
+                            <dt className="text-sm font-medium text-gray-500 truncate">Product Status</dt>
+                            <dd className="mt-1 text-3xl font-semibold text-gray-900">
+                                <div className="flex flex-col text-lg">
+                                    <span className="text-green-600">Active: {stats.activeProducts}</span>
+                                    <span className="text-red-600">Inactive: {stats.inactiveProducts}</span>
+                                </div>
+                            </dd>
                         </div>
                     </div>
                 )}

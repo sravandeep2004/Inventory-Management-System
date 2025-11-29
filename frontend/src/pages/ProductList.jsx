@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api/axiosConfig';
 import { toast } from 'react-toastify';
+import { Plus, Edit, Trash2 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const ProductList = () => {
+    const { user } = useAuth();
     const [products, setProducts] = useState([]);
     const [showModal, setShowModal] = useState(false);
+    const [editingId, setEditingId] = useState(null);
     const [formData, setFormData] = useState({
         productName: '',
         pricePerUnit: 0,
@@ -30,17 +34,49 @@ const ProductList = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const openAddModal = () => {
+        setEditingId(null);
+        setFormData({
+            productName: '',
+            pricePerUnit: 0,
+            quantity: 0,
+            status: 'ACTIVE'
+        });
+        setShowModal(true);
+    };
+
+    const handleEdit = (product) => {
+        setEditingId(product.productId);
+        setFormData({
+            productName: product.productName,
+            pricePerUnit: product.pricePerUnit,
+            quantity: product.quantity,
+            status: product.status
+        });
+        setShowModal(true);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (Number(formData.pricePerUnit) < 0 || Number(formData.quantity) < 0) {
-            toast.error("negative values not allowed", { position: "bottom-right" });
+            toast.error("Negative values not allowed", { position: "bottom-right" });
             return;
         }
 
         try {
-            await api.post('/products', formData);
+            if (editingId) {
+                // Update existing product
+                await api.put(`/products/${editingId}`, formData);
+                toast.success("Product updated successfully!", { position: "top-right" });
+            } else {
+                // Create new product
+                await api.post('/products', formData);
+                toast.success("Product added successfully!", { position: "top-right" });
+            }
+
             setShowModal(false);
+            setEditingId(null);
             setFormData({
                 productName: '',
                 pricePerUnit: 0,
@@ -48,11 +84,10 @@ const ProductList = () => {
                 status: 'ACTIVE'
             });
             fetchProducts();
-            toast.success("Product added successfully!", { position: "top-right" });
         } catch (error) {
-            console.error("Error creating product", error);
+            console.error("Error saving product", error);
             const errorMsg = error.response?.data?.message || error.message || "Unknown error";
-            toast.error(`Failed to add product: ${errorMsg}`, { position: "bottom-right" });
+            toast.error(`Failed to save product: ${errorMsg}`, { position: "bottom-right" });
         }
     };
 
@@ -74,9 +109,10 @@ const ProductList = () => {
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold text-gray-900">Product Management</h1>
                 <button
-                    onClick={() => setShowModal(true)}
-                    className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+                    onClick={openAddModal}
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 flex items-center"
                 >
+                    <Plus className="w-5 h-5 mr-2" />
                     Add Product
                 </button>
             </div>
@@ -86,7 +122,9 @@ const ProductList = () => {
                 <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
                     <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
                         <div className="mt-3 text-center">
-                            <h3 className="text-lg leading-6 font-medium text-gray-900">Add New Product</h3>
+                            <h3 className="text-lg leading-6 font-medium text-gray-900">
+                                {editingId ? 'Edit Product' : 'Add New Product'}
+                            </h3>
                             <form className="mt-2 text-left space-y-4" onSubmit={handleSubmit}>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
@@ -150,7 +188,7 @@ const ProductList = () => {
                                         type="submit"
                                         className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
                                     >
-                                        Save
+                                        {editingId ? 'Update' : 'Save'}
                                     </button>
                                 </div>
                             </form>
@@ -165,7 +203,7 @@ const ProductList = () => {
                         <li key={product.productId}>
                             <div className="px-4 py-4 flex items-center justify-between sm:px-6">
                                 <div className="flex items-center">
-                                    <div className="text-sm font-medium text-indigo-600 truncate">
+                                    <div className="text-sm font-medium text-indigo-600 truncate w-48">
                                         {product.productName}
                                     </div>
                                     <div className="ml-2 flex-shrink-0 flex">
@@ -179,12 +217,24 @@ const ProductList = () => {
                                     <div className="text-sm text-gray-500">
                                         Qty: {product.quantity} | ₹{product.pricePerUnit}
                                     </div>
-                                    <button
-                                        onClick={() => handleDelete(product.productId)}
-                                        className="text-red-600 hover:text-red-900 text-sm font-medium"
-                                    >
-                                        Delete
-                                    </button>
+                                    <div className="flex space-x-2">
+                                        {user?.role === 'ADMIN' && (
+                                            <button
+                                                onClick={() => handleEdit(product)}
+                                                className="text-indigo-600 hover:text-indigo-900 text-sm font-medium flex items-center"
+                                            >
+                                                <Edit className="w-4 h-4 mr-1" />
+                                                Edit
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={() => handleDelete(product.productId)}
+                                            className="text-red-600 hover:text-red-900 text-sm font-medium flex items-center"
+                                        >
+                                            <Trash2 className="w-4 h-4 mr-1" />
+                                            Delete
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </li>
