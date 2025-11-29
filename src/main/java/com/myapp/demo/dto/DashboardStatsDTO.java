@@ -14,6 +14,8 @@ import java.util.List;
 public class DashboardStatsDTO {
     private long totalProducts;
     private long lowStockProducts;
+    private long activeProducts;
+    private long inactiveProducts;
     private long totalStaff; // Only for admin
     private List<InventoryStockDto> recentProducts;
 }
