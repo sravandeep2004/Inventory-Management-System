@@ -27,6 +27,9 @@ public class StaffService {
     private static final Logger logger = LoggerFactory.getLogger(StaffService.class);
 
     @Autowired
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+
+    @Autowired
     private StaffRepository staffRepository;
 
     /**
@@ -54,7 +57,7 @@ public class StaffService {
                 .department(dto.getDepartment())
                 .rights(dto.getRights())
                 .phoneNumber(dto.getPhoneNumber())
-                .password(dto.getPassword()) // In production, encode this!
+                .password(passwordEncoder.encode(dto.getPassword()))
                 .status(dto.getStatus() != null ? dto.getStatus() : Status.ACTIVE)
                 .build();
 
@@ -116,7 +119,7 @@ public class StaffService {
         staff.setRights(dto.getRights());
         staff.setPhoneNumber(dto.getPhoneNumber());
         if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
-            staff.setPassword(dto.getPassword()); // In production, encode this!
+            staff.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
         if (dto.getStatus() != null) {
             staff.setStatus(dto.getStatus());
