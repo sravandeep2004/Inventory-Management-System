@@ -1,0 +1,49 @@
+services:
+  # BACKEND (Docker)
+  - type: web
+    name: inventory-backend
+    runtime: docker
+    plan: free
+    region: singapore # Change to your preferred region
+    envVars:
+      - key: DB_URL
+        fromDatabase:
+          name: inventory-db
+          property: connectionString
+      - key: DB_USERNAME
+        fromDatabase:
+          name: inventory-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: inventory-db
+          property: password
+      - key: MAIL_USERNAME
+        sync: false # User will input this in dashboard
+      - key: MAIL_PASSWORD
+        sync: false # User will input this in dashboard
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+
+  # FRONTEND (Static Site - Best for Free Tier)
+  - type: web
+    name: inventory-frontend
+    runtime: static
+    plan: free
+    region: singapore
+    buildCommand: npm install && npm run build
+    staticPublishPath: frontend/dist
+    rootDir: frontend
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: inventory-backend
+          property: url
+
+databases:
+  - name: inventory-db
+    databaseName: demo
+    user: root
+    plan: free
+    region: singapore
