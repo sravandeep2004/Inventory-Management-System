@@ -17,8 +17,6 @@ A complete full-stack application for managing product inventory and staff with 
 - **React 19**
 - **Vite**
 - **TailwindCSS**
-- **Axios**
-- **Lucide React** (Icons)
 
 ## Prerequisites
 
